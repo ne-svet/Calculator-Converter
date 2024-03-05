@@ -54,9 +54,9 @@ class _ConverterScreenState extends State<ConverterScreen> {
                         )),
                   ),
                   Text(
-                    converterLogic.flag == true ? 'Kilometrs' : 'Miles',
+                    converterLogic.flag == true ? 'Kilometrs >' : 'Miles >',
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
+                        fontWeight: FontWeight.bold, fontSize: 16,),
                   ),
                 ],
               ),
@@ -80,7 +80,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   Text(
                     converterLogic.flag == false ? 'Kilometrs' : 'Miles',
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
+                        fontWeight: FontWeight.w300, fontSize: 16),
                   ),
                 ],
               ),
