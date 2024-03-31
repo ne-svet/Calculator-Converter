@@ -1,24 +1,27 @@
 import 'package:flutter/cupertino.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 import '../buttons/button_values.dart';
+import '../provider/сalculationHistoryProvider.dart';
+import 'calculation_history.dart';
 
 class CalculatorLogic {
   //все используемые переменные
-  String number1;
-  String operand;
-  String number2;
-  String txtToDisplay;
+  String expression = '';
+  String txtToDisplayExpression = '';
+  String txtToDisplay = '';
+  String tmpValue = '';
+
+  // Добавляем переменную для хранения экземпляра CalculationHistoryProvider
+  CalculationHistoryProvider historyProvider;
 
   // обновление состояния на экране
-  VoidCallback updateStateCallback; // Assuming it's a VoidCallback type
+  VoidCallback updateStateCallback;
 
   //конструктор
   CalculatorLogic({
-    this.number1 = "",
-    this.operand = "",
-    this.number2 = "",
-    this.txtToDisplay = "",
-    required this.updateStateCallback, // Provide a default value or make it nullable
+    required this.historyProvider,
+    required this.updateStateCallback,
   });
 
   // Method to set the callback
@@ -26,161 +29,125 @@ class CalculatorLogic {
     updateStateCallback = callback;
   }
 
-//##############################################
+  //##############################################
   // FUNCTIONS
   //##############################################
 
   //удаляем введенные перед числом нули
+
   String removeZeros(String value) {
-    if (value.contains(".")) {
-      // до запятой и после запятой
-      List<String> parts = value.split(".");
-      String integerPart = parts[0].replaceAll(RegExp(r"^0+"), "");
-      String fractionalPart = parts.length > 1 ? ".${parts[1]}" : "";
-      return integerPart.isEmpty
-          ? "0$fractionalPart"
-          : "$integerPart$fractionalPart";
-    } else {
-      // If the number is an integer, remove leading zeros
-      return value.replaceAll(RegExp(r"^0+"), "");
+    value = value.replaceAll(RegExp(r'0*$'), '');
+    if (value.endsWith('.')) {
+      value = value.replaceAll('.', '');
     }
+    return value;
   }
 
-  // appends value to the end
+//##############################################
+
+  //добавляем value в выражение
   void appendValue(String value) {
-    //проверка, если не точка и если не цифра
-    if (value != Buttons.dot && int.tryParse(value) == null) {
-      // проверка, что operand и  number2 не пустые
-      if (operand.isNotEmpty && number2.isNotEmpty) {
-        // посчитать выражение перед присвоением нового операнда
-        calculate();
+    // Проверяем, является ли введенный символ арифметическим оператором
+    if ([Buttons.add, Buttons.subtract, Buttons.multiply, Buttons.divide]
+        .contains(value)) {
+      tmpValue = '';
+      // Проверяем, был ли введен арифметический оператор последним
+      if (expression.isNotEmpty &&
+          [Buttons.add, Buttons.subtract, Buttons.multiply, Buttons.divide]
+              .contains(expression[expression.length - 1])) {
+        // Если да, то заменяем последний введенный оператор на новый
+        expression = expression.substring(0, expression.length - 1) + value;
+      } else {
+        // Иначе, добавляем оператор к выражению
+        expression += value;
       }
-      //введен операнд ///////////////////////////
-      operand = value;
-    } else if (number1.isEmpty || operand.isEmpty) {
-      // проверяем точку number1 = "1.2"
-      if (value == Buttons.dot && number1.contains(Buttons.dot)) {
-        return;
-      }
-      if (value == Buttons.dot && (number1.isEmpty || number1 == Buttons.dot)) {
-        // number1 ="" | "0"
-        value = "0.";
-      }
-      //введено первое число ///////////////////////////
-      number1 += value;
-      txtToDisplay = removeZeros(number1);
-    } else if (number2.isEmpty || operand.isNotEmpty) {
-      // проверяем точку number2 = "1.2"
-      if (value == Buttons.dot && number2.contains(Buttons.dot)) {
-        return;
-      }
-      if (value == Buttons.dot && (number2.isEmpty || number2 == Buttons.dot)) {
-        // number1 ="" | "0"
-        value = "0.";
-      }
-      //введено второе число ///////////////////////////
-      number2 += value;
-      txtToDisplay = removeZeros(number2);
+    } else {
+      // Если введенный символ не является оператором, добавляем его к выражению
+      tmpValue += value;
+      txtToDisplay = tmpValue;
+      expression += value;
     }
 
-    // обновляем значения  number1/operand/number2
+    txtToDisplayExpression = expression;
     updateStateCallback();
   }
 
   //##############################################
 
-  //delete function последнюю цифру
+  //удаляем последнюю цифру
+
   void backsp() {
-    if (number2.isNotEmpty) {
-      //12345 -> 1234
-      number2 = number2.substring(0, number2.length - 1);
-      txtToDisplay = number2;
-    } else if (operand.isNotEmpty) {
-      operand = "";
-    } else if (number1.isNotEmpty) {
-      number1 = number1.substring(0, number1.length - 1);
-      txtToDisplay = number1;
+    if (expression.isNotEmpty) {
+      expression = expression.substring(0, expression.length - 1);
+      txtToDisplayExpression = expression;
+      if(tmpValue.isNotEmpty){
+        tmpValue = tmpValue.substring(0, tmpValue.length - 1);
+        txtToDisplay = tmpValue;
+      }
+      else {
+        tmpValue = '';
+      }
+
+      updateStateCallback();
     }
-    //обновление состояния
-    updateStateCallback();
   }
 
   //##############################################
   // очистить экран
+
   void clearAll() {
-    number1 = "";
-    operand = "";
-    number2 = "";
-
-    //вначале обновляем все переменные
-    txtToDisplay = "";
-
-    //обновляем состояние
+    expression = '';
+    txtToDisplayExpression = '';
+    txtToDisplay = '';
+    tmpValue = '';
     updateStateCallback();
   }
 
   //##############################################
   // процент
+
   void convertToPercentage() {
-    //ex: 434+324
-    if (number1.isNotEmpty && operand.isNotEmpty && number2.isNotEmpty) {
+    //ex: 2+3
+    if (expression.isNotEmpty) {
       // посчитать перед переводом в прценты
       calculate();
-    }
-    if (operand.isNotEmpty) {
-      //если есть операнд, но нет второго числа, то перевести в проценты невозможно
+    } else {
       return;
     }
     // переводим String в Double
-    final number = double.parse(number1);
-    number1 = "${(number / 100)}";
-
-    //вначале обновляем все переменные
-    number1 = "${(number / 100)}";
-    txtToDisplay = number1;
-    operand = "";
-    number2 = "";
-    //обновляем состояние
+    final number = double.parse(txtToDisplay);
+    txtToDisplay = "${(number / 100)}";
+    expression = txtToDisplay;
     updateStateCallback();
   }
 
   //##############################################
-  // calculate the result
+  // калькулируем
+
   void calculate() {
-    if (number1.isEmpty || operand.isEmpty || number2.isEmpty) return;
+    // Заменяем символ 'x' на оператор '*' и удаляем символ '='
+    String expressionFinal =
+        expression.replaceAll('x', '*').replaceAll('=', '').replaceAll('%', '');
 
-    // переводим числа в Double
-    final double num1 = double.parse(number1);
-    final double num2 = double.parse(number2);
+    try {
+      Parser p = Parser();
+      Expression exp = p.parse(expressionFinal);
+      ContextModel cm = ContextModel();
+      double eval = exp.evaluate(EvaluationType.REAL, cm);
+      txtToDisplay = eval.toStringAsFixed(3);
+      txtToDisplay = removeZeros(txtToDisplay);
+      expression = txtToDisplay;
 
-    var result = 0.0;
-    switch (operand) {
-      case Buttons.add:
-        result = num1 + num2;
-        break;
-      case Buttons.subtract:
-        result = num1 - num2;
-        break;
-      case Buttons.multiply:
-        result = num1 * num2;
-        break;
-      case Buttons.divide:
-        result = double.parse((num1 / num2).toStringAsFixed(3));
-        break;
-      default:
+      // Добавляем расчет в историю, создав объект CalculationHistory
+      historyProvider.addToHistory(CalculationHistory(
+        expression: txtToDisplayExpression,
+        result: txtToDisplay,
+        date: DateTime.now(),
+      ));
+      updateStateCallback();
+    } catch (e) {
+      txtToDisplay = 'Error';
+      updateStateCallback();
     }
-
-    //вначале обновляем все переменные
-    number1 = "$result";
-    operand = "";
-    number2 = "";
-    // тут мы удаляем у целого числа ".0"
-    if (number1.endsWith(".0")) {
-      number1 = number1.substring(0, number1.length - 2);
-    }
-    txtToDisplay = number1;
-
-    //обновляем состояние
-    updateStateCallback();
   }
 }

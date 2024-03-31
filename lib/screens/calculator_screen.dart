@@ -1,6 +1,8 @@
 import 'package:calculator_gadalova/logic/calculator_logic.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../buttons/button_values.dart';
+import '../provider/сalculationHistoryProvider.dart';
 import '../widgets/buildButton_widget.dart';
 import '../widgets/myNavigationBar.dart';
 
@@ -17,10 +19,15 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   @override
   void initState() {
     super.initState();
-    // Pass a callback function to update the state of CalculatorScreen
-    calculatorLogic = CalculatorLogic(updateStateCallback: () {
-      setState(() {}); // You can update the state as needed
-    });
+    calculatorLogic = CalculatorLogic(
+      historyProvider: Provider.of<CalculationHistoryProvider>(
+          context,
+          //не слушаем, т.к. не надо перестраивать экран
+          listen: false), // Передаем экземпляр CalculationHistoryProvider
+      updateStateCallback: () {
+        setState(() {}); // Обновляем состояние, когда необходимо
+      },
+    );
   }
 
   @override
@@ -38,11 +45,12 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             Container(
               alignment: Alignment.bottomRight,
               padding: const EdgeInsets.all(20),
-              child: Text(
-                "${calculatorLogic.number1}${calculatorLogic.operand}${calculatorLogic.number2}"
-                        .isEmpty
+              child:
+                  // полное выражение
+                  Text(
+                calculatorLogic.txtToDisplayExpression.isEmpty
                     ? ""
-                    : "${calculatorLogic.number1}${calculatorLogic.operand}${calculatorLogic.number2}",
+                    : calculatorLogic.txtToDisplayExpression,
                 style: const TextStyle(
                   fontSize: 20,
                   color: Colors.grey,
@@ -60,7 +68,9 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   padding: const EdgeInsets.all(20),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Text(
+                    child:
+                        // то, что видно крупно, вводимое число
+                        Text(
                       calculatorLogic.txtToDisplay.isEmpty
                           ? "0"
                           : calculatorLogic.txtToDisplay,
@@ -108,6 +118,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                               }
 
                               if (value == Buttons.calc) {
+                                calculatorLogic.appendValue(value);
                                 calculatorLogic.calculate();
                                 return;
                               }

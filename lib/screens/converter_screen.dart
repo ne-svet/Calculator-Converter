@@ -19,11 +19,10 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void initState() {
     super.initState();
     converterLogic = ConverterLogic(
-        updateStateCallback: () {
-          setState(() {}); // Ensure to call setState here
-        },
-        txtConverted: "",
-        flag: true);
+      updateStateCallback: () {
+        setState(() {});
+      },
+    );
   }
 
   @override
@@ -56,7 +55,9 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   Text(
                     converterLogic.flag == true ? 'Kilometrs >' : 'Miles >',
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16,),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),

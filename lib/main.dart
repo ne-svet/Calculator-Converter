@@ -1,9 +1,18 @@
+import 'package:calculator_gadalova/provider/сalculationHistoryProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 
 import 'Screens/calculator_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      //создаем и предоставляем объект CalculationHistoryModel, который будет использоваться во всем приложении.
+      create: (context) => CalculationHistoryProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
