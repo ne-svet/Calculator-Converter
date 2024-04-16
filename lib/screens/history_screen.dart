@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../logic/calculation_history.dart';
 import '../provider/сalculationHistoryProvider.dart';
 import '../widgets/myNavigationBar.dart';
 import 'package:intl/intl.dart';
 
 class HistoryScreen extends StatelessWidget {
+
+  //конструктор
+  HistoryScreen ({super.key});
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,50 +20,55 @@ class HistoryScreen extends StatelessWidget {
       body: SafeArea(
         // Когда данные, предоставляемые провайдером, изменяются,
         // Consumer перестраивается, чтобы отобразить эти изменения в UI
-        child: Consumer<CalculationHistoryProvider>(
-          builder: (context, historyModel, child) {
-            // Если история пуста, отобразить сообщение об этом
-            if (historyModel.history.isEmpty) {
-              return const Center(
-                child: Text(
-                  'History is empty',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-              );
-            } else {
-              // Иначе отобразить элементы списка истории
-              return Padding(
-                padding: const EdgeInsets.all(20),
-                child: ListView.builder(
-                  // Количество элементов в списке равно размеру истории
-                  itemCount: historyModel.history.length,
-                  // Для каждого элемента истории создать ListTile
-                  itemBuilder: (context, index) {
-                    final item = historyModel.history[index];
-                    return ListTile(
-                      title: Text(item.expression),
-                      subtitle: Text(
-                        item.result,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
+        //поскольку это асинхронная операция в будущем - то FutureBuilder
+        child: SingleChildScrollView(
+          child: FutureBuilder<List<CalculationHistory>>(
+            //задаем функцию достать историю
+            future: Provider.of<CalculationHistoryProvider>(context).getAllCalculationHistory(),
+            //какой виджет показывать ---->
+              builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData
+              && snapshot.data!.isNotEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: snapshot.data!.map((calculationHistory) {
+                    Column col = Column(
+                      children: [
+                        Text(
+                          '${DateFormat('yyyy-MM-dd HH:mm').format(
+                              calculationHistory.date)} '
                         ),
-                      ),
-                      trailing: Text(
-                        // Вывести дату и время в формате 'yyyy-MM-dd HH:mm'
-                        DateFormat('yyyy-MM-dd HH:mm').format(item.date),
-                        style: const TextStyle(
-                          fontSize: 15,
+                        Text(
+                              '${calculationHistory.expression} ${calculationHistory.result} ',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Container(
+                            height: 2,
+                            color: Colors.black12,
+                          ),
+                        )
+                      ],
                     );
-                  },
-                ),
-              );
-            }
-          },
+                    return col;
+                  }).toList(),
+                  ),
+                );
+              } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                return Center(child: Text('History is empty now'),);
+              } else {
+                return Center(
+                  child: Text('Loading...'),
+                );
+              }    }
+          ),
+
         ),
       ),
       floatingActionButton: ElevatedButton(
@@ -70,7 +82,7 @@ class HistoryScreen extends StatelessWidget {
           'Clear history',
           style: TextStyle(
               color: Colors.black,
-          fontSize: 15),
+              fontSize: 15),
         ),
       ),
     );

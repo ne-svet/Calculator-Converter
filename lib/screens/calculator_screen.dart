@@ -46,8 +46,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               alignment: Alignment.bottomRight,
               padding: const EdgeInsets.all(20),
               child:
-                  // полное выражение
-                  Text(
+              // полное выражение
+              Text(
                 calculatorLogic.txtToDisplayExpression.isEmpty
                     ? ""
                     : calculatorLogic.txtToDisplayExpression,
@@ -69,8 +69,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child:
-                        // то, что видно крупно, вводимое число
-                        Text(
+                    // то, что видно крупно, вводимое число
+                    Text(
                       calculatorLogic.txtToDisplay.isEmpty
                           ? "0"
                           : calculatorLogic.txtToDisplay,

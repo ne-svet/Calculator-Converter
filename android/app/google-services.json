@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1009689479538",
+    "project_id": "calculator-history-f7c62",
+    "storage_bucket": "calculator-history-f7c62.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1009689479538:android:d4fa6c59db489f85f3f5eb",
+        "android_client_info": {
+          "package_name": "com.example.calculator_gadalova"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-wK5Cvvnh4l6btnhIo-mJ7hvpkL1Fh10"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

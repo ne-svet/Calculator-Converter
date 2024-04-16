@@ -106,18 +106,34 @@ class CalculatorLogic {
   //##############################################
   // процент
 
+  bool isNumeric(String str) {
+    if (str == null) {
+      return false;
+    }
+    try {
+      double.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   void convertToPercentage() {
+   double.parse(expression);
+
     //ex: 2+3
-    if (expression.isNotEmpty) {
+    if (expression.isNotEmpty && !isNumeric(expression)) {
       // посчитать перед переводом в прценты
       calculate();
+    } else if (isNumeric(expression)) {
+      //если введено одно число без арифметического знака, то ничего не делаем
     } else {
       return;
     }
     // переводим String в Double
     final number = double.parse(txtToDisplay);
     txtToDisplay = "${(number / 100)}";
-    expression = txtToDisplay;
+    expression =  txtToDisplay;
     updateStateCallback();
   }
 
@@ -127,7 +143,7 @@ class CalculatorLogic {
   void calculate() {
     // Заменяем символ 'x' на оператор '*' и удаляем символ '='
     String expressionFinal =
-        expression.replaceAll('x', '*').replaceAll('=', '').replaceAll('%', '');
+    expression.replaceAll('x', '*').replaceAll('=', '').replaceAll('%', '');
 
     try {
       Parser p = Parser();
@@ -139,10 +155,10 @@ class CalculatorLogic {
       expression = txtToDisplay;
 
       // Добавляем расчет в историю, создав объект CalculationHistory
-      historyProvider.addToHistory(CalculationHistory(
-        expression: txtToDisplayExpression,
-        result: txtToDisplay,
-        date: DateTime.now(),
+      historyProvider.addCalculationHistory(CalculationHistory(
+        txtToDisplayExpression,
+        txtToDisplay,
+        DateTime.now(),
       ));
       updateStateCallback();
     } catch (e) {
