@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../buttons/button_values.dart';
 import '../logic/converter_logic.dart';
+import '../provider/сalculationHistoryProvider.dart';
 import '../widgets/buildButton_widget.dart';
 import '../widgets/myNavigationBar.dart';
 
@@ -19,8 +21,12 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void initState() {
     super.initState();
     converterLogic = ConverterLogic(
+      historyProvider: Provider.of<CalculationHistoryProvider>(
+          context,
+          //не слушаем, т.к. не надо перестраивать экран
+          listen: false), // Передаем экземпляр CalculationHistoryProvider
       updateStateCallback: () {
-        setState(() {});
+        setState(() {}); // Обновляем состояние, когда необходимо
       },
     );
   }

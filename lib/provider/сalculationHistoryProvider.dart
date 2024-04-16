@@ -7,9 +7,9 @@ import '../logic/calculation_history.dart';
 
 class CalculationHistoryProvider extends ChangeNotifier {
   //список _history, который хранит историю вычислений
-  List<CalculationHistory> _history = [];
+  //List<CalculationHistory> _history = [];
 
-  List<CalculationHistory> get history => _history;
+  //List<CalculationHistory> get history => _history;
 
   PersistenceController persistenceController = FirestoreController();
   //  добавляет новые записи в историю

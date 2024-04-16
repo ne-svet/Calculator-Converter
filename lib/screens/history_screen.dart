@@ -61,9 +61,13 @@ class HistoryScreen extends StatelessWidget {
                   ),
                 );
               } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                return Center(child: Text('History is empty now'),);
+                return const Center(
+                  heightFactor: 30,
+                  child: Text('History is empty now'),
+                );
               } else {
-                return Center(
+                return const Center(
+                  heightFactor: 30,
                   child: Text('Loading...'),
                 );
               }    }
